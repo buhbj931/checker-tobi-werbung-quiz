@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Checker Tobi: Werbung Fragen</title>
+<style>
+  @font-face { font-family: 'Roboto Mono Fallback'; src: local('Roboto Mono'); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    background: #f2f2f2;
+    color: #1a1a1a;
+  }
+  header {
+    background: #48B136;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    gap: 16px;
+  }
+  header .icon-box {
+    background: #fff;
+    color: #48B136;
+    width: 56px; height: 56px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  header .titles h1 {
+    margin: 0;
+    font-size: 20px;
+  }
+  header .titles p {
+    margin: 2px 0 0 0;
+    font-size: 12px;
+    opacity: 0.9;
+  }
+  main {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 16px 60px 16px;
+  }
+  .hint {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #48B136;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .quiz-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 24px;
+    margin-top: 20px;
+  }
+  .progress {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+  .question {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  .options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .option {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    background: #fafafa;
+    font-size: 15px;
+    transition: border-color .15s, background .15s;
+  }
+  .option:hover { border-color: #48B136; }
+  .option.correct { border-color: #2e9e2e; background: #e5f7e5; }
+  .option.wrong { border-color: #d9534f; background: #fbe7e6; }
+  .option.disabled { pointer-events: none; }
+  .nav-row {
+    margin-top: 22px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  button.next-btn {
+    background: #48B136;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 22px;
+    font-size: 15px;
+    font-family: inherit;
+    cursor: pointer;
+    display: none;
+  }
+  button.next-btn.show { display: inline-block; }
+  #result-wrap { display: none; text-align: center; }
+  #result-wrap h2 { color: #48B136; }
+  footer {
+    text-align: center;
+    font-size: 11px;
+    color: #888;
+    margin-top: 40px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="icon-box">📢</div>
+  <div class="titles">
+    <h1>Checker Tobi: Werbung Fragen</h1>
+    <p>Deutsch &middot; Emotionen in der Werbung &middot; Klasse 7</p>
+  </div>
+</header>
+
+<main>
+  <div class="hint">Ihr habt das Checker-Tobi-Video zur Aufgabe schon angeschaut? Dann geht es hier direkt mit den Fragen weiter.</div>
+
+  <div id="quiz-wrap">
+    <div class="quiz-card">
+      <div class="progress" id="progress"></div>
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="nav-row">
+        <button class="next-btn" id="next-btn">Weiter →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="result-wrap" class="quiz-card">
+    <h2>Fertig!</h2>
+    <p id="score-text"></p>
+    <div class="nav-row" style="justify-content:center;">
+      <button class="next-btn show" id="restart-btn">Nochmal von vorne</button>
+    </div>
+  </div>
+</main>
+
+<footer>Eigenständige HTML-Version (ersetzt LearningApps-Einbettung, da YouTube in der Schule blockiert ist). Das Video wird separat in DiLer bereitgestellt.</footer>
+
+<script>
+const questions = [
+  {
+    q: "Würdest du Tobis Limonade auch gerne probieren?",
+    options: ["JA!!!", "Nein"],
+    correct: 0
+  },
+  {
+    q: "Was ist eine Zielgruppe?",
+    options: [
+      "Personengruppe, denen man das Produkt verkaufen möchte.",
+      "Personen, die man gerne mag und auf die man zählen kann.",
+      "Eine Gruppe von Personen, die nichts gemeinsam haben."
+    ],
+    correct: 0
+  },
+  {
+    q: "Welcher Name hat die Limonade von Tobi?",
+    options: ["ZitroLimo", "Checker Brause", "Tobis's Limonade", "Tobi's Brause"],
+    correct: 1
+  },
+  {
+    q: "Was ist ein Slogan?",
+    options: ["kurzer, cooler Werbespruch", "langweiliger Werbespruch"],
+    correct: 0
+  },
+  {
+    q: "Wie lautet Tobis Slogan für seine Limonade?",
+    options: ["\"Die beste Limonade der Welt!\"", "\"Super süß!\"", "\"So lecker und gesund!\"", "\"Lecker vom Checker!\""],
+    correct: 3
+  },
+  {
+    q: "Werden Werbefotos bearbeitet?",
+    options: ["Ja", "Nein"],
+    correct: 0
+  },
+  {
+    q: "Was ist Schleichwerbung?",
+    options: ["versteckte Werbung", "Werbung mit Musik"],
+    correct: 0
+  },
+  {
+    q: "Wie wirken Werbespots?",
+    options: [
+      "Sie zeigen uns, warum ein Produkt ungesund ist. Die Menschen wirken unglücklich und halten uns vom Kauf ab.",
+      "Man möchte das Produkt kaufen. Fröhliche Werbungen lassen uns glauben, dass wir durch das Produkt auch glücklich sein können."
+    ],
+    correct: 1
+  }
+];
+
+let current = 0;
+let scoreCorrect = 0;
+
+const quizWrap = document.getElementById('quiz-wrap');
+const resultWrap = document.getElementById('result-wrap');
+
+function renderQuestion() {
+  const item = questions[current];
+  document.getElementById('progress').textContent = `Frage ${current + 1} / ${questions.length}`;
+  document.getElementById('question').textContent = item.q;
+  const optWrap = document.getElementById('options');
+  optWrap.innerHTML = '';
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.classList.remove('show');
+
+  item.options.forEach((opt, idx) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = opt;
+    div.addEventListener('click', () => {
+      const allOpts = optWrap.querySelectorAll('.option');
+      allOpts.forEach(o => o.classList.add('disabled'));
+      if (idx === item.correct) {
+        div.classList.add('correct');
+        scoreCorrect++;
+      } else {
+        div.classList.add('wrong');
+        allOpts[item.correct].classList.add('correct');
+      }
+      nextBtn.classList.add('show');
+    });
+    optWrap.appendChild(div);
+  });
+}
+
+document.getElementById('next-btn').addEventListener('click', () => {
+  current++;
+  if (current < questions.length) {
+    renderQuestion();
+  } else {
+    quizWrap.style.display = 'none';
+    resultWrap.style.display = 'block';
+    document.getElementById('score-text').textContent =
+      `Du hast ${scoreCorrect} von ${questions.length} Fragen richtig beantwortet.`;
+  }
+});
+
+document.getElementById('restart-btn').addEventListener('click', () => {
+  current = 0;
+  scoreCorrect = 0;
+  resultWrap.style.display = 'none';
+  quizWrap.style.display = 'block';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>
